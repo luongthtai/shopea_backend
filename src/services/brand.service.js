@@ -45,14 +45,18 @@ const createBrand = async (data) => {
 
         if (!createAccount) return response.failure({ message: "Create account fail !!!", err_code: "create" })
 
-        await brandModel.create({
+        const createBrand = await brandModel.create({
             brand_description,
             start_time: time_start,
             end_time: time_end,
-            account: createAccount._id
+            account: createAccount._id,
         })
 
-        return response.success({ message: "Create brand success !!!" })
+        if (createBrand) return response.success({ message: "Create brand success !!!" })
+        else {
+            await accountModel.deleteOne({ _id: createAccount._id })
+            return response.failure({ message: "Create brand infor fail !!!" })
+        }
     } catch (error) {
         return response.failure({ message: "Create brand fail in service !!!", err_code: error.message })
     }
